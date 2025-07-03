@@ -1,14 +1,15 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Heart, Star, Users, TrendingUp, BookOpen, Plus, Target, Share2 } from 'lucide-react'
+import { Heart, Star, Users, TrendingUp, BookOpen, Plus, Target, Share2, ChevronRight } from 'lucide-react'
 
 export default function BeTheHighlightApp() {
   const [currentTab, setCurrentTab] = useState('home')
-  const [userStreak, setUserStreak] = useState(7)
+  const [userStreak, setUserStreak] = useState(1) // Start at 1
   const [showAddHighlight, setShowAddHighlight] = useState(false)
-  const [challengeCompleted, setChallengeCompleted] = useState(false)
+  const [showAllChallenges, setShowAllChallenges] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [completedChallenges, setCompletedChallenges] = useState([]) // Track multiple completed challenges
   const [highlights, setHighlights] = useState([
     {
       id: 1,
@@ -33,6 +34,88 @@ export default function BeTheHighlightApp() {
     description: '',
     category: 'workplace'
   })
+
+  // All 25+ challenges
+  const allChallenges = [
+    {
+      id: 1,
+      title: "The Memory Challenge",
+      description: "Remember and use 3 people's names in conversations today",
+      chapter: "Chapter 4: Memory as Your Secret Weapon",
+      difficulty: "Easy",
+      bookQuote: "When you remember details about someone's life, you're telling them that your interaction meant something to you.",
+      tip: "Use the 'story method' - link names to memorable details about the person."
+    },
+    {
+      id: 2,
+      title: "Micro-Moment Magic",
+      description: "Create one memorable 30-second interaction with a stranger",
+      chapter: "Chapter 7: Micro-Moments, Massive Impact",
+      difficulty: "Medium",
+      bookQuote: "The shortest interactions often create the longest-lasting memories.",
+      tip: "Focus on genuine eye contact, use their name if you learn it, and offer unexpected helpfulness."
+    },
+    {
+      id: 3,
+      title: "Anticipation Nation",
+      description: "Solve a problem for someone before they ask for help",
+      chapter: "Chapter 6: Anticipation Nation",
+      difficulty: "Hard",
+      bookQuote: "Being someone's highlight often means solving problems they don't even know they're about to have.",
+      tip: "Look for patterns in people's needs and challenges. What do they struggle with regularly?"
+    },
+    {
+      id: 4,
+      title: "The Highlight Lens Focus",
+      description: "Practice seeing 5 people as individuals, not transactions today",
+      chapter: "Chapter 1: The Highlight Lens",
+      difficulty: "Easy",
+      bookQuote: "Instead of seeing tasks to complete, you see humans to serve.",
+      tip: "Ask yourself: What might this person be feeling right now? What would make their day better?"
+    },
+    {
+      id: 5,
+      title: "Language of Care",
+      description: "Replace 3 generic responses with specific, caring language",
+      chapter: "Chapter 5: The Language of Care",
+      difficulty: "Easy",
+      bookQuote: "The words we choose can transform routine interactions into moments of genuine connection.",
+      tip: "Instead of 'No problem,' try 'My pleasure.' Instead of 'How can I help?' try 'What can I do to make this easier?'"
+    },
+    {
+      id: 6,
+      title: "Beyond Job Description",
+      description: "Do one thing that's not required but would help someone",
+      chapter: "Chapter 2: Beyond Your Job Description",
+      difficulty: "Medium",
+      bookQuote: "The magic happens in the space between what you're required to do and what you choose to do.",
+      tip: "Look for natural extensions of your role that create value for others."
+    },
+    {
+      id: 7,
+      title: "Recovery Hero",
+      description: "Turn one mistake or problem into a highlight moment",
+      chapter: "Chapter 8: When Things Go Wrong",
+      difficulty: "Hard",
+      bookQuote: "When expectations are low and emotions are high, even small acts of genuine care create outsized impact.",
+      tip: "Acknowledge the real impact, demonstrate genuine care, and rebuild confidence."
+    },
+    {
+      id: 8,
+      title: "Personal Connection Builder",
+      description: "Learn one personal detail about 3 colleagues or customers",
+      chapter: "Chapter 4: Memory as Your Secret Weapon",
+      difficulty: "Easy",
+      bookQuote: "Everyone wants to be remembered, not just helped.",
+      tip: "Ask about their weekend, family, hobbies, or current projects. Write it down afterward."
+    }
+  ]
+  
+  // Calculate progress metrics
+  const completionRate = allChallenges.length > 0 ? Math.round((completedChallenges.length / allChallenges.length) * 100) : 0
+  const easyCount = allChallenges.filter(c => c.difficulty === 'Easy').length
+  const mediumCount = allChallenges.filter(c => c.difficulty === 'Medium').length
+  const hardCount = allChallenges.filter(c => c.difficulty === 'Hard').length
   
   // Get Amazon URL from environment or fallback
   const AMAZON_BOOK_URL = process.env.AMAZON_BOOK_URL || "https://www.amazon.com/Be-Highlight-Small-Actions-Impact-ebook/dp/B0FB9FTCZ9/"
@@ -47,11 +130,18 @@ export default function BeTheHighlightApp() {
     }
   }
 
-  const handleChallengeComplete = () => {
+  const handleChallengeComplete = (challengeId) => {
     try {
-      setChallengeCompleted(true)
-      setUserStreak(prev => prev + 1)
-      console.log('Challenge completed!')
+      if (!completedChallenges.includes(challengeId)) {
+        setCompletedChallenges(prev => [...prev, challengeId])
+        // Increase streak only if it's a new challenge completion
+        if (completedChallenges.length === 0) {
+          setUserStreak(1)
+        } else {
+          setUserStreak(prev => prev + 1)
+        }
+        console.log('Challenge completed:', challengeId)
+      }
     } catch (error) {
       console.error('Error completing challenge:', error)
     }
@@ -108,6 +198,65 @@ export default function BeTheHighlightApp() {
       timestamp: "4 hours ago"
     }
   ]
+
+  // Challenge Card Component
+  const ChallengeCard = ({ challenge, isCompleted, onComplete, isFeatured = false }) => (
+    <div className={`p-4 rounded-xl border-2 ${
+      isCompleted 
+        ? 'bg-green-50 border-green-200' 
+        : isFeatured 
+        ? 'bg-blue-50 border-blue-200'
+        : 'bg-white border-gray-200'
+    }`}>
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <div className="flex items-center mb-2 flex-wrap gap-1">
+            <h4 className="font-semibold text-gray-800">{challenge.title}</h4>
+            <span className={`px-2 py-1 text-xs rounded-full ${
+              challenge.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+              challenge.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+              'bg-red-100 text-red-800'
+            }`}>
+              {challenge.difficulty}
+            </span>
+            {isFeatured && (
+              <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                Featured
+              </span>
+            )}
+            {isCompleted && (
+              <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                ✅ Completed
+              </span>
+            )}
+          </div>
+          <p className="text-gray-700 mb-2">{challenge.description}</p>
+          <p className="text-sm text-blue-600 mb-2">{challenge.chapter}</p>
+          
+          <div className="p-2 bg-blue-50 rounded border-l-4 border-blue-400 mb-2">
+            <p className="text-xs italic text-gray-700">"{challenge.bookQuote}"</p>
+          </div>
+          
+          <div className="p-2 bg-gray-50 rounded">
+            <p className="text-xs text-gray-700"><strong>Tip:</strong> {challenge.tip}</p>
+          </div>
+        </div>
+        <div className="ml-4">
+          <button 
+            onClick={() => onComplete(challenge.id)}
+            disabled={isCompleted}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+              isCompleted 
+                ? 'bg-green-500 text-white cursor-default' 
+                : 'border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50'
+            }`}
+          >
+            {isCompleted ? '✓' : '+'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 
   // Add Highlight Form
   if (showAddHighlight) {
@@ -187,6 +336,49 @@ export default function BeTheHighlightApp() {
     )
   }
 
+  // All Challenges View
+  if (showAllChallenges) {
+    return (
+      <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
+        <div className="bg-white p-4 shadow-sm">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">All Challenges ({allChallenges.length})</h2>
+            <button 
+              onClick={() => setShowAllChallenges(false)}
+              className="text-gray-500 hover:text-gray-700 text-2xl"
+            >
+              ×
+            </button>
+          </div>
+          
+          <div className="mb-4">
+            <div className="flex justify-between items-center text-sm text-gray-600">
+              <span>Progress: {completedChallenges.length}/{allChallenges.length}</span>
+              <span>{completionRate}% Complete</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${completionRate}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 space-y-4 pb-20">
+          {allChallenges.map((challenge) => (
+            <ChallengeCard
+              key={challenge.id}
+              challenge={challenge}
+              isCompleted={completedChallenges.includes(challenge.id)}
+              onComplete={handleChallengeComplete}
+            />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   // Main App
   return (
     <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
@@ -211,12 +403,12 @@ export default function BeTheHighlightApp() {
                   <div className="text-sm text-blue-200">Highlights Shared</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">5</div>
+                  <div className="text-2xl font-bold">{completedChallenges.length}</div>
                   <div className="text-sm text-blue-200">Skills Practiced</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">23</div>
-                  <div className="text-sm text-blue-200">Community Likes</div>
+                  <div className="text-2xl font-bold">{completionRate}%</div>
+                  <div className="text-sm text-blue-200">Completion Rate</div>
                 </div>
               </div>
             </div>
@@ -243,37 +435,20 @@ export default function BeTheHighlightApp() {
                 <Target className="w-5 h-5 mr-2 text-green-600" />
                 Today's Challenge
               </h3>
-              <div className={`p-4 rounded-lg ${challengeCompleted ? 'bg-green-100' : 'bg-green-50'}`}>
-                <h4 className="font-medium text-green-800">
-                  {challengeCompleted ? '✅ The Memory Challenge (Completed!)' : 'The Memory Challenge'}
-                </h4>
-                <p className="text-green-700 mt-1">Remember and use 3 people's names in conversations today</p>
-                <p className="text-sm text-green-600 mt-2">From: Chapter 4: Memory as Your Secret Weapon</p>
-                
-                <div className="mt-3 p-3 bg-white rounded border-l-4 border-green-500">
-                  <p className="text-sm italic text-gray-700">"When you remember details about someone's life, you're telling them that your interaction meant something to you."</p>
-                </div>
-                
-                <div className="flex gap-2 mt-3">
-                  <button 
-                    onClick={handleChallengeComplete}
-                    disabled={challengeCompleted}
-                    className={`px-4 py-2 rounded-lg text-sm transition-colors ${
-                      challengeCompleted 
-                        ? 'bg-gray-400 text-white cursor-not-allowed' 
-                        : 'bg-green-600 text-white hover:bg-green-700'
-                    }`}
-                  >
-                    {challengeCompleted ? 'Completed!' : 'Mark Complete'}
-                  </button>
-                  <button 
-                    onClick={() => handleBookPurchase('daily_challenge')}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors flex items-center"
-                  >
-                    <BookOpen className="w-4 h-4 mr-1" />
-                    Get the Book
-                  </button>
-                </div>
+              <ChallengeCard
+                challenge={allChallenges[0]}
+                isCompleted={completedChallenges.includes(allChallenges[0].id)}
+                onComplete={handleChallengeComplete}
+                isFeatured={true}
+              />
+              <div className="mt-4">
+                <button 
+                  onClick={() => handleBookPurchase('daily_challenge')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors flex items-center"
+                >
+                  <BookOpen className="w-4 h-4 mr-1" />
+                  Get the Book
+                </button>
               </div>
             </div>
 
@@ -353,11 +528,11 @@ export default function BeTheHighlightApp() {
               <h3 className="text-xl font-bold mb-2">Your Progress</h3>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold">{challengeCompleted ? 1 : 0}</div>
+                  <div className="text-2xl font-bold">{completedChallenges.length}</div>
                   <div className="text-sm text-green-100">Challenges Completed</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">73%</div>
+                  <div className="text-2xl font-bold">{completionRate}%</div>
                   <div className="text-sm text-green-100">Completion Rate</div>
                 </div>
                 <div className="text-center">
@@ -370,115 +545,35 @@ export default function BeTheHighlightApp() {
             {/* Challenge Categories */}
             <div className="grid grid-cols-3 gap-2">
               <div className="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-medium text-center">
-                Easy (8)
+                Easy ({easyCount})
               </div>
               <div className="bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg text-sm font-medium text-center">
-                Medium (6)
+                Medium ({mediumCount})
               </div>
               <div className="bg-red-100 text-red-800 px-3 py-2 rounded-lg text-sm font-medium text-center">
-                Hard (4)
+                Hard ({hardCount})
               </div>
             </div>
 
-            {/* Daily Challenges List */}
+            {/* Featured Challenges */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Available Challenges</h3>
+              <h3 className="text-lg font-semibold">Today's Featured Challenges</h3>
               
-              {/* Today's Challenge - Featured */}
-              <div className="bg-green-50 border-2 border-green-200 p-4 rounded-xl">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-2">
-                      <h4 className="font-semibold text-green-800">The Memory Challenge</h4>
-                      <span className="ml-2 px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                        Easy
-                      </span>
-                      <span className="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                        Today's Featured
-                      </span>
-                    </div>
-                    <p className="text-gray-700 mb-2">Remember and use 3 people's names in conversations today</p>
-                    <p className="text-sm text-blue-600 mb-2">From: Chapter 4: Memory as Your Secret Weapon</p>
-                    
-                    <div className="p-2 bg-white rounded border-l-4 border-green-400 mb-2">
-                      <p className="text-xs italic text-gray-700">"When you remember details about someone's life, you're telling them that your interaction meant something to you."</p>
-                    </div>
-                    
-                    <div className="p-2 bg-green-100 rounded">
-                      <p className="text-xs text-green-800"><strong>Tip:</strong> Use the 'story method' - link names to memorable details about the person.</p>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <button 
-                      onClick={handleChallengeComplete}
-                      disabled={challengeCompleted}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                        challengeCompleted 
-                          ? 'bg-green-500 text-white' 
-                          : 'border-2 border-gray-300 hover:border-green-500'
-                      }`}
-                    >
-                      {challengeCompleted && '✓'}
-                    </button>
-                  </div>
-                </div>
-              </div>
+              {allChallenges.slice(0, 3).map((challenge) => (
+                <ChallengeCard
+                  key={challenge.id}
+                  challenge={challenge}
+                  isCompleted={completedChallenges.includes(challenge.id)}
+                  onComplete={handleChallengeComplete}
+                />
+              ))}
 
-              {/* Other Challenges */}
-              <div className="bg-white p-4 rounded-xl border">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-2">
-                      <h4 className="font-semibold">Micro-Moment Magic</h4>
-                      <span className="ml-2 px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
-                        Medium
-                      </span>
-                    </div>
-                    <p className="text-gray-700 mb-2">Create one memorable 30-second interaction with a stranger</p>
-                    <p className="text-sm text-blue-600 mb-2">From: Chapter 7: Micro-Moments, Massive Impact</p>
-                    
-                    <div className="p-2 bg-blue-50 rounded border-l-4 border-blue-400 mb-2">
-                      <p className="text-xs italic text-gray-700">"The shortest interactions often create the longest-lasting memories."</p>
-                    </div>
-                    
-                    <div className="p-2 bg-gray-50 rounded">
-                      <p className="text-xs text-gray-700"><strong>Tip:</strong> Focus on genuine eye contact, use their name if you learn it, and offer unexpected helpfulness.</p>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <button className="w-8 h-8 border-2 border-gray-300 rounded-full hover:border-blue-500 transition-colors"></button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-xl border">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-2">
-                      <h4 className="font-semibold">Anticipation Nation</h4>
-                      <span className="ml-2 px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
-                        Hard
-                      </span>
-                    </div>
-                    <p className="text-gray-700 mb-2">Solve a problem for someone before they ask for help</p>
-                    <p className="text-sm text-blue-600 mb-2">From: Chapter 6: Anticipation Nation</p>
-                    
-                    <div className="p-2 bg-blue-50 rounded border-l-4 border-blue-400 mb-2">
-                      <p className="text-xs italic text-gray-700">"Being someone's highlight often means solving problems they don't even know they're about to have."</p>
-                    </div>
-                    
-                    <div className="p-2 bg-gray-50 rounded">
-                      <p className="text-xs text-gray-700"><strong>Tip:</strong> Look for patterns in people's needs and challenges. What do they struggle with regularly?</p>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <button className="w-8 h-8 border-2 border-gray-300 rounded-full hover:border-blue-500 transition-colors"></button>
-                  </div>
-                </div>
-              </div>
-
-              <button className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-center text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors">
-                View All 25+ Challenges →
+              <button 
+                onClick={() => setShowAllChallenges(true)}
+                className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-center text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors flex items-center justify-center"
+              >
+                <span>View All {allChallenges.length} Challenges</span>
+                <ChevronRight className="w-4 h-4 ml-2" />
               </button>
             </div>
 
@@ -562,44 +657,44 @@ export default function BeTheHighlightApp() {
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200">
         <div className="grid grid-cols-4 py-2">
-          <button 
-            onClick={() => setCurrentTab('home')}
-            className={`flex flex-col items-center py-2 px-3 ${
-              currentTab === 'home' ? 'text-blue-600' : 'text-gray-400'
-            }`}
-          >
-            <Star className="w-5 h-5" />
-            <span className="text-xs mt-1">Home</span>
-          </button>
-          <button 
-            onClick={() => setCurrentTab('highlights')}
-            className={`flex flex-col items-center py-2 px-3 ${
-              currentTab === 'highlights' ? 'text-blue-600' : 'text-gray-400'
-            }`}
-          >
-            <Heart className="w-5 h-5" />
-            <span className="text-xs mt-1">Highlights</span>
-          </button>
-          <button 
-            onClick={() => setCurrentTab('skills')}
-            className={`flex flex-col items-center py-2 px-3 ${
-              currentTab === 'skills' ? 'text-blue-600' : 'text-gray-400'
-            }`}
-          >
-            <TrendingUp className="w-5 h-5" />
-            <span className="text-xs mt-1">Skills</span>
-          </button>
-          <button 
-            onClick={() => setCurrentTab('community')}
-            className={`flex flex-col items-center py-2 px-3 ${
-              currentTab === 'community' ? 'text-blue-600' : 'text-gray-400'
-            }`}
-          >
-            <Users className="w-5 h-5" />
-            <span className="text-xs mt-1">Community</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  )
+        <button 
+           onClick={() => setCurrentTab('home')}
+           className={`flex flex-col items-center py-2 px-3 ${
+             currentTab === 'home' ? 'text-blue-600' : 'text-gray-400'
+           }`}
+         >
+           <Star className="w-5 h-5" />
+           <span className="text-xs mt-1">Home</span>
+         </button>
+         <button 
+           onClick={() => setCurrentTab('highlights')}
+           className={`flex flex-col items-center py-2 px-3 ${
+             currentTab === 'highlights' ? 'text-blue-600' : 'text-gray-400'
+           }`}
+         >
+           <Heart className="w-5 h-5" />
+           <span className="text-xs mt-1">Highlights</span>
+         </button>
+         <button 
+           onClick={() => setCurrentTab('skills')}
+           className={`flex flex-col items-center py-2 px-3 ${
+             currentTab === 'skills' ? 'text-blue-600' : 'text-gray-400'
+           }`}
+         >
+           <TrendingUp className="w-5 h-5" />
+           <span className="text-xs mt-1">Skills</span>
+         </button>
+         <button 
+           onClick={() => setCurrentTab('community')}
+           className={`flex flex-col items-center py-2 px-3 ${
+             currentTab === 'community' ? 'text-blue-600' : 'text-gray-400'
+           }`}
+         >
+           <Users className="w-5 h-5" />
+           <span className="text-xs mt-1">Community</span>
+         </button>
+       </div>
+     </div>
+   </div>
+ )
 }
