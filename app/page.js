@@ -605,7 +605,7 @@ export default function BeTheHighlightApp() {
           </div>
         )}
 
-       {/* COMMUNITY TAB */}
+      {/* COMMUNITY TAB */}
 {currentTab === 'community' && (
   <div className="space-y-6">
     <div className="flex justify-between items-center">
