@@ -16,11 +16,6 @@ export const metadata = {
     locale: 'en_US',
     type: 'website',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Be the Highlight - Transform Everyday Moments',
-    description: 'Learn to create highlight moments in every interaction.',
-  },
   robots: {
     index: true,
     follow: true,
@@ -29,12 +24,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="canonical" href="https://bethehighlight.com" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-      </head>
-      <body className={inter.className}>
+    <html lang="en" className={inter.className}>
+      <body className="bg-gray-50 text-gray-900">
         {children}
       </body>
     </html>
