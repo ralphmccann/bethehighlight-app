@@ -43,7 +43,6 @@ export default function BeTheHighlightApp() {
       window.open(AMAZON_BOOK_URL, '_blank', 'noopener,noreferrer')
     } catch (error) {
       console.error('Error opening book link:', error)
-      // Fallback: try direct navigation
       window.location.href = AMAZON_BOOK_URL
     }
   }
@@ -66,6 +65,28 @@ export default function BeTheHighlightApp() {
       }
       
       setIsLoading(true)
+      const highlight = {
+        id: Date.now(),
+        ...newHighlight,
+        likes: 0,
+        timestamp: new Date().toISOString()
+      }
+      setHighlights([highlight, ...highlights])
+      setNewHighlight({
+        type: 'given',
+        title: '',
+        description: '',
+        category: 'workplace'
+      })
+      setShowAddHighlight(false)
+      setIsLoading(false)
+      console.log('Highlight added!')
+    } catch (error) {
+      console.error('Error adding highlight:', error)
+      setIsLoading(false)
+      alert('Error adding highlight. Please try again.')
+    }
+  }
 
   const communityHighlights = [
     {
@@ -155,9 +176,10 @@ export default function BeTheHighlightApp() {
 
             <button 
               onClick={handleAddHighlight}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              Share Highlight
+              {isLoading ? 'Sharing...' : 'Share Highlight'}
             </button>
           </div>
         </div>
@@ -322,171 +344,171 @@ export default function BeTheHighlightApp() {
           </div>
         )}
 
-{/* SKILLS TAB */}
-{currentTab === 'skills' && (
-  <div className="space-y-6">
-    <h2 className="text-2xl font-bold">Highlight Skills Practice</h2>
-    
-    <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white p-6 rounded-xl">
-      <h3 className="text-xl font-bold mb-2">Your Progress</h3>
-      <div className="grid grid-cols-3 gap-4">
-        <div className="text-center">
-          <div className="text-2xl font-bold">{challengeCompleted ? 1 : 0}</div>
-          <div className="text-sm text-green-100">Challenges Completed</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold">73%</div>
-          <div className="text-sm text-green-100">Completion Rate</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold">{userStreak}</div>
-          <div className="text-sm text-green-100">Day Streak</div>
-        </div>
-      </div>
-    </div>
-
-    {/* Challenge Categories */}
-    <div className="grid grid-cols-3 gap-2">
-      <div className="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-medium text-center">
-        Easy (8)
-      </div>
-      <div className="bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg text-sm font-medium text-center">
-        Medium (6)
-      </div>
-      <div className="bg-red-100 text-red-800 px-3 py-2 rounded-lg text-sm font-medium text-center">
-        Hard (4)
-      </div>
-    </div>
-
-    {/* Daily Challenges List */}
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Available Challenges</h3>
-      
-      {/* Today's Challenge - Featured */}
-      <div className="bg-green-50 border-2 border-green-200 p-4 rounded-xl">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center mb-2">
-              <h4 className="font-semibold text-green-800">The Memory Challenge</h4>
-              <span className="ml-2 px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                Easy
-              </span>
-              <span className="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                Today's Featured
-              </span>
-            </div>
-            <p className="text-gray-700 mb-2">Remember and use 3 people's names in conversations today</p>
-            <p className="text-sm text-blue-600 mb-2">From: Chapter 4: Memory as Your Secret Weapon</p>
+        {/* SKILLS TAB */}
+        {currentTab === 'skills' && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold">Highlight Skills Practice</h2>
             
-            <div className="p-2 bg-white rounded border-l-4 border-green-400 mb-2">
-              <p className="text-xs italic text-gray-700">"When you remember details about someone's life, you're telling them that your interaction meant something to you."</p>
+            <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white p-6 rounded-xl">
+              <h3 className="text-xl font-bold mb-2">Your Progress</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{challengeCompleted ? 1 : 0}</div>
+                  <div className="text-sm text-green-100">Challenges Completed</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">73%</div>
+                  <div className="text-sm text-green-100">Completion Rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">{userStreak}</div>
+                  <div className="text-sm text-green-100">Day Streak</div>
+                </div>
+              </div>
             </div>
-            
-            <div className="p-2 bg-green-100 rounded">
-              <p className="text-xs text-green-800"><strong>Tip:</strong> Use the 'story method' - link names to memorable details about the person.</p>
+
+            {/* Challenge Categories */}
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-medium text-center">
+                Easy (8)
+              </div>
+              <div className="bg-yellow-100 text-yellow-800 px-3 py-2 rounded-lg text-sm font-medium text-center">
+                Medium (6)
+              </div>
+              <div className="bg-red-100 text-red-800 px-3 py-2 rounded-lg text-sm font-medium text-center">
+                Hard (4)
+              </div>
+            </div>
+
+            {/* Daily Challenges List */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Available Challenges</h3>
+              
+              {/* Today's Challenge - Featured */}
+              <div className="bg-green-50 border-2 border-green-200 p-4 rounded-xl">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <h4 className="font-semibold text-green-800">The Memory Challenge</h4>
+                      <span className="ml-2 px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                        Easy
+                      </span>
+                      <span className="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                        Today's Featured
+                      </span>
+                    </div>
+                    <p className="text-gray-700 mb-2">Remember and use 3 people's names in conversations today</p>
+                    <p className="text-sm text-blue-600 mb-2">From: Chapter 4: Memory as Your Secret Weapon</p>
+                    
+                    <div className="p-2 bg-white rounded border-l-4 border-green-400 mb-2">
+                      <p className="text-xs italic text-gray-700">"When you remember details about someone's life, you're telling them that your interaction meant something to you."</p>
+                    </div>
+                    
+                    <div className="p-2 bg-green-100 rounded">
+                      <p className="text-xs text-green-800"><strong>Tip:</strong> Use the 'story method' - link names to memorable details about the person.</p>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <button 
+                      onClick={handleChallengeComplete}
+                      disabled={challengeCompleted}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                        challengeCompleted 
+                          ? 'bg-green-500 text-white' 
+                          : 'border-2 border-gray-300 hover:border-green-500'
+                      }`}
+                    >
+                      {challengeCompleted && '✓'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Other Challenges */}
+              <div className="bg-white p-4 rounded-xl border">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <h4 className="font-semibold">Micro-Moment Magic</h4>
+                      <span className="ml-2 px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                        Medium
+                      </span>
+                    </div>
+                    <p className="text-gray-700 mb-2">Create one memorable 30-second interaction with a stranger</p>
+                    <p className="text-sm text-blue-600 mb-2">From: Chapter 7: Micro-Moments, Massive Impact</p>
+                    
+                    <div className="p-2 bg-blue-50 rounded border-l-4 border-blue-400 mb-2">
+                      <p className="text-xs italic text-gray-700">"The shortest interactions often create the longest-lasting memories."</p>
+                    </div>
+                    
+                    <div className="p-2 bg-gray-50 rounded">
+                      <p className="text-xs text-gray-700"><strong>Tip:</strong> Focus on genuine eye contact, use their name if you learn it, and offer unexpected helpfulness.</p>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <button className="w-8 h-8 border-2 border-gray-300 rounded-full hover:border-blue-500 transition-colors"></button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-xl border">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <h4 className="font-semibold">Anticipation Nation</h4>
+                      <span className="ml-2 px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                        Hard
+                      </span>
+                    </div>
+                    <p className="text-gray-700 mb-2">Solve a problem for someone before they ask for help</p>
+                    <p className="text-sm text-blue-600 mb-2">From: Chapter 6: Anticipation Nation</p>
+                    
+                    <div className="p-2 bg-blue-50 rounded border-l-4 border-blue-400 mb-2">
+                      <p className="text-xs italic text-gray-700">"Being someone's highlight often means solving problems they don't even know they're about to have."</p>
+                    </div>
+                    
+                    <div className="p-2 bg-gray-50 rounded">
+                      <p className="text-xs text-gray-700"><strong>Tip:</strong> Look for patterns in people's needs and challenges. What do they struggle with regularly?</p>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <button className="w-8 h-8 border-2 border-gray-300 rounded-full hover:border-blue-500 transition-colors"></button>
+                  </div>
+                </div>
+              </div>
+
+              <button className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-center text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors">
+                View All 25+ Challenges →
+              </button>
+            </div>
+
+            <div className="bg-blue-50 p-6 rounded-xl">
+              <h3 className="text-lg font-semibold mb-3 flex items-center">
+                <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
+                From the Book: "Be the Highlight"
+              </h3>
+              <p className="text-gray-700 mb-4">
+                "The most powerful highlight moments often begin with a single decision: to pay attention differently. 
+                Starting tomorrow morning, approach your first interaction of the day with complete presence."
+              </p>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => handleBookPurchase('skills_tab')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Get the Book on Amazon
+                </button>
+                <button 
+                  onClick={() => handleBookPurchase('free_preview')}
+                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Free Preview
+                </button>
+              </div>
             </div>
           </div>
-          <div className="ml-4">
-            <button 
-              onClick={handleChallengeComplete}
-              disabled={challengeCompleted}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                challengeCompleted 
-                  ? 'bg-green-500 text-white' 
-                  : 'border-2 border-gray-300 hover:border-green-500'
-              }`}
-            >
-              {challengeCompleted && '✓'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Other Challenges */}
-      <div className="bg-white p-4 rounded-xl border">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center mb-2">
-              <h4 className="font-semibold">Micro-Moment Magic</h4>
-              <span className="ml-2 px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
-                Medium
-              </span>
-            </div>
-            <p className="text-gray-700 mb-2">Create one memorable 30-second interaction with a stranger</p>
-            <p className="text-sm text-blue-600 mb-2">From: Chapter 7: Micro-Moments, Massive Impact</p>
-            
-            <div className="p-2 bg-blue-50 rounded border-l-4 border-blue-400 mb-2">
-              <p className="text-xs italic text-gray-700">"The shortest interactions often create the longest-lasting memories."</p>
-            </div>
-            
-            <div className="p-2 bg-gray-50 rounded">
-              <p className="text-xs text-gray-700"><strong>Tip:</strong> Focus on genuine eye contact, use their name if you learn it, and offer unexpected helpfulness.</p>
-            </div>
-          </div>
-          <div className="ml-4">
-            <button className="w-8 h-8 border-2 border-gray-300 rounded-full hover:border-blue-500 transition-colors"></button>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white p-4 rounded-xl border">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center mb-2">
-              <h4 className="font-semibold">Anticipation Nation</h4>
-              <span className="ml-2 px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
-                Hard
-              </span>
-            </div>
-            <p className="text-gray-700 mb-2">Solve a problem for someone before they ask for help</p>
-            <p className="text-sm text-blue-600 mb-2">From: Chapter 6: Anticipation Nation</p>
-            
-            <div className="p-2 bg-blue-50 rounded border-l-4 border-blue-400 mb-2">
-              <p className="text-xs italic text-gray-700">"Being someone's highlight often means solving problems they don't even know they're about to have."</p>
-            </div>
-            
-            <div className="p-2 bg-gray-50 rounded">
-              <p className="text-xs text-gray-700"><strong>Tip:</strong> Look for patterns in people's needs and challenges. What do they struggle with regularly?</p>
-            </div>
-          </div>
-          <div className="ml-4">
-            <button className="w-8 h-8 border-2 border-gray-300 rounded-full hover:border-blue-500 transition-colors"></button>
-          </div>
-        </div>
-      </div>
-
-      <button className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-center text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors">
-        View All 25+ Challenges →
-      </button>
-    </div>
-
-    <div className="bg-blue-50 p-6 rounded-xl">
-      <h3 className="text-lg font-semibold mb-3 flex items-center">
-        <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
-        From the Book: "Be the Highlight"
-      </h3>
-      <p className="text-gray-700 mb-4">
-        "The most powerful highlight moments often begin with a single decision: to pay attention differently. 
-        Starting tomorrow morning, approach your first interaction of the day with complete presence."
-      </p>
-      <div className="flex gap-2">
-        <button 
-          onClick={() => handleBookPurchase('skills_tab')}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-        >
-          <BookOpen className="w-4 h-4 mr-2" />
-          Get the Book on Amazon
-        </button>
-        <button 
-          onClick={() => handleBookPurchase('free_preview')}
-          className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-        >
-          Free Preview
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        )}
 
         {/* COMMUNITY TAB */}
         {currentTab === 'community' && (
