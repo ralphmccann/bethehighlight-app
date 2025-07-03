@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Heart, Star, Users, TrendingUp, BookOpen, Plus, Target, Share2 } from 'lucide-react'
 
 export default function BeTheHighlightApp() {
@@ -8,6 +8,7 @@ export default function BeTheHighlightApp() {
   const [userStreak, setUserStreak] = useState(7)
   const [showAddHighlight, setShowAddHighlight] = useState(false)
   const [challengeCompleted, setChallengeCompleted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [highlights, setHighlights] = useState([
     {
       id: 1,
@@ -33,37 +34,38 @@ export default function BeTheHighlightApp() {
     category: 'workplace'
   })
   
-  const AMAZON_BOOK_URL = "https://www.amazon.com/Be-Highlight-Small-Actions-Impact-ebook/dp/B0FB9FTCZ9/"
+  // Get Amazon URL from environment or fallback
+  const AMAZON_BOOK_URL = process.env.AMAZON_BOOK_URL || "https://www.amazon.com/Be-Highlight-Small-Actions-Impact-ebook/dp/B0FB9FTCZ9/"
   
   const handleBookPurchase = (source) => {
-    console.log('Book purchase clicked from:', source)
-    window.open(AMAZON_BOOK_URL, '_blank')
+    try {
+      console.log('Book purchase clicked from:', source)
+      window.open(AMAZON_BOOK_URL, '_blank', 'noopener,noreferrer')
+    } catch (error) {
+      console.error('Error opening book link:', error)
+      // Fallback: try direct navigation
+      window.location.href = AMAZON_BOOK_URL
+    }
   }
 
   const handleChallengeComplete = () => {
-    setChallengeCompleted(true)
-    setUserStreak(prev => prev + 1)
-    console.log('Challenge completed!')
+    try {
+      setChallengeCompleted(true)
+      setUserStreak(prev => prev + 1)
+      console.log('Challenge completed!')
+    } catch (error) {
+      console.error('Error completing challenge:', error)
+    }
   }
 
   const handleAddHighlight = () => {
-    if (newHighlight.title && newHighlight.description) {
-      const highlight = {
-        id: highlights.length + 1,
-        ...newHighlight,
-        likes: 0
+    try {
+      if (!newHighlight.title.trim() || !newHighlight.description.trim()) {
+        alert('Please fill in both title and description')
+        return
       }
-      setHighlights([highlight, ...highlights])
-      setNewHighlight({
-        type: 'given',
-        title: '',
-        description: '',
-        category: 'workplace'
-      })
-      setShowAddHighlight(false)
-      console.log('Highlight added!')
-    }
-  }
+      
+      setIsLoading(true)
 
   const communityHighlights = [
     {
