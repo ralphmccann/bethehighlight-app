@@ -1,4 +1,3 @@
-// FILE: app/page.js
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -49,10 +48,8 @@ export default function BeTheHighlightApp() {
 
   // Analytics tracking functions
   const trackEvent = (eventName, properties = {}) => {
-    // In production, this would send to analytics service
     console.log('Analytics:', eventName, properties)
     
-    // You can add Google Analytics, Mixpanel, or other tracking here
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', eventName, {
         event_category: 'user_interaction',
@@ -61,7 +58,6 @@ export default function BeTheHighlightApp() {
       })
     }
     
-    // Update user stats based on events
     if (eventName === 'challenge_completed') {
       setUserStats(prev => ({
         ...prev,
@@ -85,7 +81,7 @@ export default function BeTheHighlightApp() {
     window.open(AMAZON_BOOK_URL, '_blank')
   }
 
-  const dailyChallenges = [
+  const [dailyChallenges, setDailyChallenges] = useState([
     {
       id: 1,
       title: "The Memory Challenge",
@@ -116,14 +112,17 @@ export default function BeTheHighlightApp() {
       bookQuote: "Being someone's highlight often means solving problems they don't even know they're about to have.",
       tip: "Look for patterns in people's needs and challenges. What do they struggle with regularly?"
     }
-  ]
+  ])
 
   const handleChallengeComplete = (challengeId) => {
-    trackEvent('challenge_completed', { challengeId, difficulty: dailyChallenges[challengeId - 1]?.difficulty })
-    const challengeIndex = dailyChallenges.findIndex(c => c.id === challengeId)
-    if (challengeIndex !== -1) {
-      dailyChallenges[challengeIndex].completed = true
-    }
+    trackEvent('challenge_completed', { challengeId })
+    setDailyChallenges(prev => 
+      prev.map(challenge => 
+        challenge.id === challengeId 
+          ? { ...challenge, completed: true }
+          : challenge
+      )
+    )
   }
 
   const getCurrentChallenge = () => {
@@ -199,7 +198,6 @@ export default function BeTheHighlightApp() {
 
   const HomeTab = () => (
     <div className="space-y-6">
-      {/* Welcome Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-xl">
         <h2 className="text-2xl font-bold mb-2">Welcome to Be the Highlight!</h2>
         <p className="text-blue-100">You're on a {userStreak}-day highlight streak! 🔥</p>
@@ -219,7 +217,6 @@ export default function BeTheHighlightApp() {
         </div>
       </div>
 
-      {/* Book Promotion Banner */}
       <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white p-6 rounded-xl">
         <div className="flex items-center justify-between">
           <div className="flex-1">
@@ -235,8 +232,7 @@ export default function BeTheHighlightApp() {
         </div>
       </div>
 
-      {/* Today's Challenge */}
-      <div className="card">
+      <div className="bg-white p-6 rounded-xl shadow-sm border">
         <h3 className="text-lg font-semibold mb-3 flex items-center">
           <Target className="w-5 h-5 mr-2 text-green-600" />
           Today's Challenge
@@ -257,13 +253,13 @@ export default function BeTheHighlightApp() {
           <div className="flex gap-2 mt-3">
             <button 
               onClick={() => handleChallengeComplete(getCurrentChallenge().id)}
-              className="btn-primary bg-green-600 hover:bg-green-700"
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
               Mark Complete
             </button>
             <button 
               onClick={() => handleBookPurchase('daily_challenge')}
-              className="btn-primary flex items-center"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
             >
               <BookOpen className="w-4 h-4 mr-1" />
               Get the Book
@@ -272,7 +268,6 @@ export default function BeTheHighlightApp() {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-4">
         <button 
           onClick={() => setShowAddHighlight(true)}
@@ -326,7 +321,7 @@ export default function BeTheHighlightApp() {
         <div className="flex gap-2">
           <button 
             onClick={() => handleBookPurchase('skills_tab')}
-            className="btn-primary flex items-center"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
           >
             <BookOpen className="w-4 h-4 mr-2" />
             Get the Book on Amazon
@@ -334,11 +329,10 @@ export default function BeTheHighlightApp() {
         </div>
       </div>
 
-      {/* Skills Practice Section */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Practice Areas</h3>
         {dailyChallenges.map((challenge) => (
-          <div key={challenge.id} className="card">
+          <div key={challenge.id} className="bg-white p-6 rounded-xl shadow-sm border">
             <div className="flex items-center justify-between mb-2">
               <h4 className="font-medium">{challenge.title}</h4>
               <span className={`px-2 py-1 rounded text-xs ${
@@ -376,29 +370,27 @@ export default function BeTheHighlightApp() {
         <h2 className="text-2xl font-bold">My Highlights</h2>
         <button 
           onClick={() => setShowAddHighlight(true)}
-          className="btn-primary flex items-center"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
         >
           <Plus className="w-4 h-4 mr-1" />
           Add Highlight
         </button>
       </div>
 
-      {/* Stats Overview */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="card text-center">
+        <div className="bg-white p-6 rounded-xl shadow-sm border text-center">
           <div className="text-2xl font-bold text-blue-600">{highlights.length}</div>
           <div className="text-sm text-gray-600">Total Highlights</div>
         </div>
-        <div className="card text-center">
+        <div className="bg-white p-6 rounded-xl shadow-sm border text-center">
           <div className="text-2xl font-bold text-green-600">{highlights.reduce((sum, h) => sum + h.likes, 0)}</div>
           <div className="text-sm text-gray-600">Total Likes</div>
         </div>
       </div>
 
-      {/* Highlights List */}
       <div className="space-y-4">
         {highlights.map((highlight) => (
-          <div key={highlight.id} className="card">
+          <div key={highlight.id} className="bg-white p-6 rounded-xl shadow-sm border">
             <div className="flex items-center justify-between mb-2">
               <span className={`px-2 py-1 rounded text-xs ${
                 highlight.type === 'given' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
@@ -421,52 +413,13 @@ export default function BeTheHighlightApp() {
       </div>
 
       {highlights.length === 0 && (
-        <div className="card text-center py-8">
+        <div className="bg-white p-6 rounded-xl shadow-sm border text-center py-8">
           <Heart className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-600 mb-2">No highlights yet</h3>
           <p className="text-gray-500 mb-4">Start sharing your highlight moments!</p>
           <button 
-            onClick={() => setCurrentTab('home')}
-            className={`flex flex-col items-center py-2 px-3 ${
-              currentTab === 'home' ? 'text-blue-600' : 'text-gray-400'
-            }`}
-          >
-            <Star className="w-5 h-5" />
-            <span className="text-xs mt-1">Home</span>
-          </button>
-          <button 
-            onClick={() => setCurrentTab('highlights')}
-            className={`flex flex-col items-center py-2 px-3 ${
-              currentTab === 'highlights' ? 'text-blue-600' : 'text-gray-400'
-            }`}
-          >
-            <Heart className="w-5 h-5" />
-            <span className="text-xs mt-1">My Highlights</span>
-          </button>
-          <button 
-            onClick={() => setCurrentTab('skills')}
-            className={`flex flex-col items-center py-2 px-3 ${
-              currentTab === 'skills' ? 'text-blue-600' : 'text-gray-400'
-            }`}
-          >
-            <TrendingUp className="w-5 h-5" />
-            <span className="text-xs mt-1">Skills</span>
-          </button>
-          <button 
-            onClick={() => setCurrentTab('community')}
-            className={`flex flex-col items-center py-2 px-3 ${
-              currentTab === 'community' ? 'text-blue-600' : 'text-gray-400'
-            }`}
-          >
-            <Users className="w-5 h-5" />
-            <span className="text-xs mt-1">Community</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}ShowAddHighlight(true)}
-            className="btn-primary"
+            onClick={() => setShowAddHighlight(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Add Your First Highlight
           </button>
@@ -479,7 +432,6 @@ export default function BeTheHighlightApp() {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Community Highlights</h2>
       
-      {/* Community Stats */}
       <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-xl">
         <h3 className="text-xl font-bold mb-2">Community Impact</h3>
         <div className="grid grid-cols-3 gap-4">
@@ -498,7 +450,6 @@ export default function BeTheHighlightApp() {
         </div>
       </div>
 
-      {/* Trending Highlights */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold flex items-center">
           <TrendingUp className="w-5 h-5 mr-2 text-purple-600" />
@@ -506,7 +457,7 @@ export default function BeTheHighlightApp() {
         </h3>
         
         {communityHighlights.map((highlight) => (
-          <div key={highlight.id} className="card">
+          <div key={highlight.id} className="bg-white p-6 rounded-xl shadow-sm border">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold mr-3">
@@ -556,7 +507,6 @@ export default function BeTheHighlightApp() {
         ))}
       </div>
 
-      {/* Book Promotion in Community */}
       <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white p-6 rounded-xl">
         <h3 className="text-lg font-bold mb-2">Join the Movement</h3>
         <p className="text-indigo-100 text-sm mb-4">
@@ -586,7 +536,6 @@ export default function BeTheHighlightApp() {
         </div>
         
         <div className="space-y-4">
-          {/* Type Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
             <div className="flex gap-2">
@@ -613,7 +562,6 @@ export default function BeTheHighlightApp() {
             </div>
           </div>
 
-          {/* Category Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
             <select 
@@ -629,7 +577,6 @@ export default function BeTheHighlightApp() {
             </select>
           </div>
 
-          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
             <input
@@ -641,7 +588,6 @@ export default function BeTheHighlightApp() {
             />
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
             <textarea
@@ -653,7 +599,6 @@ export default function BeTheHighlightApp() {
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-2 pt-4">
             <button 
               onClick={() => setShowAddHighlight(false)}
@@ -679,14 +624,12 @@ export default function BeTheHighlightApp() {
   }
 
   return (
-    <div className="max-w-md mx-auto bg-gray-50 min-h-screen mobile-optimized">
-      {/* Header */}
+    <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
       <div className="bg-white p-4 shadow-sm">
         <h1 className="text-2xl font-bold text-center text-gray-900">Be the Highlight</h1>
         <p className="text-center text-gray-600 text-sm mt-1">Transform everyday moments</p>
       </div>
 
-      {/* Content */}
       <div className="p-4 pb-20">
         {currentTab === 'home' && <HomeTab />}
         {currentTab === 'highlights' && <HighlightsTab />}
@@ -694,8 +637,46 @@ export default function BeTheHighlightApp() {
         {currentTab === 'community' && <CommunityTab />}
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 no-print">
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200">
         <div className="grid grid-cols-4 py-2">
           <button 
-            onClick={() => set
+            onClick={() => setCurrentTab('home')}
+            className={`flex flex-col items-center py-2 px-3 ${
+              currentTab === 'home' ? 'text-blue-600' : 'text-gray-400'
+            }`}
+          >
+            <Star className="w-5 h-5" />
+            <span className="text-xs mt-1">Home</span>
+          </button>
+          <button 
+            onClick={() => setCurrentTab('highlights')}
+            className={`flex flex-col items-center py-2 px-3 ${
+              currentTab === 'highlights' ? 'text-blue-600' : 'text-gray-400'
+            }`}
+          >
+            <Heart className="w-5 h-5" />
+            <span className="text-xs mt-1">My Highlights</span>
+          </button>
+          <button 
+            onClick={() => setCurrentTab('skills')}
+            className={`flex flex-col items-center py-2 px-3 ${
+              currentTab === 'skills' ? 'text-blue-600' : 'text-gray-400'
+            }`}
+          >
+            <TrendingUp className="w-5 h-5" />
+            <span className="text-xs mt-1">Skills</span>
+          </button>
+          <button 
+            onClick={() => setCurrentTab('community')}
+            className={`flex flex-col items-center py-2 px-3 ${
+              currentTab === 'community' ? 'text-blue-600' : 'text-gray-400'
+            }`}
+          >
+            <Users className="w-5 h-5" />
+            <span className="text-xs mt-1">Community</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
