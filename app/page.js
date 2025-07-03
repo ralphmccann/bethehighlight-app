@@ -90,7 +90,8 @@ export default function BeTheHighlightApp() {
       difficulty: "Easy",
       completed: false,
       bookQuote: "When you remember details about someone's life, you're telling them that your interaction meant something to you.",
-      tip: "Use the 'story method' - link names to memorable details about the person."
+      tip: "Use the 'story method' - link names to memorable details about the person.",
+      practiceCount: 0
     },
     {
       id: 2,
@@ -98,9 +99,10 @@ export default function BeTheHighlightApp() {
       description: "Create one memorable 30-second interaction with a stranger",
       chapter: "Chapter 7: Micro-Moments, Massive Impact",
       difficulty: "Medium",
-      completed: true,
+      completed: false,
       bookQuote: "The shortest interactions often create the longest-lasting memories.",
-      tip: "Focus on genuine eye contact, use their name if you learn it, and offer unexpected helpfulness."
+      tip: "Focus on genuine eye contact, use their name if you learn it, and offer unexpected helpfulness.",
+      practiceCount: 0
     },
     {
       id: 3,
@@ -110,19 +112,72 @@ export default function BeTheHighlightApp() {
       difficulty: "Hard",
       completed: false,
       bookQuote: "Being someone's highlight often means solving problems they don't even know they're about to have.",
-      tip: "Look for patterns in people's needs and challenges. What do they struggle with regularly?"
+      tip: "Look for patterns in people's needs and challenges. What do they struggle with regularly?",
+      practiceCount: 0
+    },
+    {
+      id: 4,
+      title: "The Listening Challenge",
+      description: "Practice active listening with 2 people - repeat back what they said",
+      chapter: "Chapter 3: The Power of Presence",
+      difficulty: "Easy",
+      completed: false,
+      bookQuote: "Most people are not listening to understand, they're listening to reply.",
+      tip: "Use phrases like 'What I'm hearing is...' or 'It sounds like you're saying...'",
+      practiceCount: 0
+    },
+    {
+      id: 5,
+      title: "Gratitude Express",
+      description: "Tell someone specifically what you appreciate about them",
+      chapter: "Chapter 8: Recognition Revolution",
+      difficulty: "Medium",
+      completed: false,
+      bookQuote: "Specific appreciation creates lasting impact - tell them exactly what they did and how it made you feel.",
+      tip: "Use the formula: 'When you [specific action], it made me feel [emotion] because [reason].'",
+      practiceCount: 0
     }
   ])
 
+  const [completedToday, setCompletedToday] = useState(new Set())
+
   const handleChallengeComplete = (challengeId) => {
-    trackEvent('challenge_completed', { challengeId })
+    console.log('Completing challenge:', challengeId)
+    
+    // Update the specific challenge
     setDailyChallenges(prev => 
       prev.map(challenge => 
         challenge.id === challengeId 
-          ? { ...challenge, completed: true }
+          ? { ...challenge, completed: true, practiceCount: challenge.practiceCount + 1 }
           : challenge
       )
     )
+    
+    // Add to completed today set
+    setCompletedToday(prev => new Set([...prev, challengeId]))
+    
+    // Update user stats
+    setUserStats(prev => ({
+      ...prev,
+      challengeCompletionRate: Math.min(100, prev.challengeCompletionRate + 5)
+    }))
+    
+    // Track analytics
+    trackEvent('challenge_completed', { challengeId, timestamp: new Date().toISOString() })
+  }
+
+  const handlePracticeChallenge = (challengeId) => {
+    console.log('Practicing challenge:', challengeId)
+    
+    setDailyChallenges(prev => 
+      prev.map(challenge => 
+        challenge.id === challengeId 
+          ? { ...challenge, practiceCount: challenge.practiceCount + 1 }
+          : challenge
+      )
+    )
+    
+    trackEvent('challenge_practiced', { challengeId })
   }
 
   const getCurrentChallenge = () => {
@@ -296,11 +351,11 @@ export default function BeTheHighlightApp() {
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold">{dailyChallenges.filter(c => c.completed).length}</div>
-            <div className="text-sm text-green-100">Challenges Completed</div>
+            <div className="text-sm text-green-100">Completed Today</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">{userStats.challengeCompletionRate}%</div>
-            <div className="text-sm text-green-100">Completion Rate</div>
+            <div className="text-2xl font-bold">{dailyChallenges.reduce((sum, c) => sum + c.practiceCount, 0)}</div>
+            <div className="text-sm text-green-100">Total Practice</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold">{userStreak}</div>
@@ -330,11 +385,18 @@ export default function BeTheHighlightApp() {
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Practice Areas</h3>
+        <h3 className="text-lg font-semibold">Today's Practice Areas</h3>
         {dailyChallenges.map((challenge) => (
           <div key={challenge.id} className="bg-white p-6 rounded-xl shadow-sm border">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="font-medium">{challenge.title}</h4>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center">
+                <h4 className="font-medium mr-3">{challenge.title}</h4>
+                {challenge.completed && (
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                    ✓ Completed
+                  </span>
+                )}
+              </div>
               <span className={`px-2 py-1 rounded text-xs ${
                 challenge.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
                 challenge.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
@@ -343,23 +405,72 @@ export default function BeTheHighlightApp() {
                 {challenge.difficulty}
               </span>
             </div>
+            
             <p className="text-gray-600 text-sm mb-3">{challenge.description}</p>
+            
+            <div className="bg-blue-50 p-3 rounded-lg mb-3">
+              <p className="text-sm text-blue-800 italic">"{challenge.bookQuote}"</p>
+            </div>
+            
+            <div className="bg-yellow-50 p-3 rounded-lg mb-4">
+              <p className="text-sm text-yellow-800"><strong>💡 Tip:</strong> {challenge.tip}</p>
+            </div>
+            
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">{challenge.chapter}</span>
-              <button 
-                onClick={() => handleChallengeComplete(challenge.id)}
-                className={`px-3 py-1 rounded text-sm ${
-                  challenge.completed 
-                    ? 'bg-green-100 text-green-800 cursor-default' 
-                    : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                }`}
-                disabled={challenge.completed}
-              >
-                {challenge.completed ? 'Completed ✓' : 'Try This'}
-              </button>
+              <div className="flex items-center text-sm text-gray-500">
+                <span className="mr-4">{challenge.chapter}</span>
+                {challenge.practiceCount > 0 && (
+                  <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">
+                    Practiced {challenge.practiceCount} time{challenge.practiceCount !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => handlePracticeChallenge(challenge.id)}
+                  className="px-3 py-1 bg-purple-100 text-purple-800 rounded text-sm hover:bg-purple-200 transition-colors"
+                >
+                  Practice This
+                </button>
+                <button 
+                  onClick={() => handleChallengeComplete(challenge.id)}
+                  className={`px-3 py-1 rounded text-sm transition-colors ${
+                    challenge.completed 
+                      ? 'bg-green-100 text-green-800 cursor-default' 
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
+                  disabled={challenge.completed}
+                >
+                  {challenge.completed ? 'Completed Today ✓' : 'Mark Complete'}
+                </button>
+              </div>
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Progress Summary */}
+      <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-xl">
+        <h3 className="text-lg font-bold mb-2">Skills Development Progress</h3>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <div className="text-sm text-purple-100">Completion Rate</div>
+            <div className="text-2xl font-bold">
+              {Math.round((dailyChallenges.filter(c => c.completed).length / dailyChallenges.length) * 100)}%
+            </div>
+          </div>
+          <div>
+            <div className="text-sm text-purple-100">Most Practiced</div>
+            <div className="text-lg font-medium">
+              {dailyChallenges.reduce((max, challenge) => 
+                challenge.practiceCount > max.practiceCount ? challenge : max
+              ).title.split(' ')[0]}...
+            </div>
+          </div>
+        </div>
+        <p className="text-purple-100 text-sm">
+          Keep practicing! Each interaction is an opportunity to be someone's highlight moment.
+        </p>
       </div>
     </div>
   )
