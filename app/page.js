@@ -605,96 +605,210 @@ export default function BeTheHighlightApp() {
           </div>
         )}
 
-        {/* COMMUNITY TAB */}
-        {currentTab === 'community' && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Community Highlights</h2>
-            
-            <div className="space-y-4">
-              {communityHighlights.map((highlight) => (
-                <div key={highlight.id} className="bg-white p-6 rounded-xl shadow-sm border">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900">{highlight.title}</h3>
-                    <span className="text-sm text-gray-500">{highlight.timestamp}</span>
-                  </div>
-                  <p className="text-sm text-blue-600 mb-2">by {highlight.user}</p>
-                  <p className="text-gray-700 mb-4">{highlight.description}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      <button className="flex items-center hover:text-red-500">
-                        <Heart className="w-4 h-4 mr-1" />
-                        {highlight.likes}
-                      </button>
-                      <button className="hover:text-blue-500">
-                        {highlight.comments} comments
-                      </button>
-                    </div>
-                    <button className="text-blue-600 text-sm hover:text-blue-700">
-                      <Share2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+       {/* COMMUNITY TAB */}
+{currentTab === 'community' && (
+  <div className="space-y-6">
+    <div className="flex justify-between items-center">
+      <h2 className="text-2xl font-bold">Community Highlights</h2>
+      <button 
+        onClick={() => setShowAddHighlight(true)}
+        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
+      >
+        Share Yours
+      </button>
+    </div>
 
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-xl">
-              <h3 className="text-lg font-bold mb-2">💡 Inspired by these stories?</h3>
-              <p className="text-purple-100 mb-4">
-                These highlight moments come from people applying the principles in "Be the Highlight". 
-                Get the complete guide with 200+ pages of strategies, stories, and practical tools.
-              </p>
-              <button 
-                onClick={() => handleBookPurchase('community_inspired')}
-                className="bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
-              >
-                📚 Get the Book on Amazon
+    {/* Community Stats */}
+    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-xl">
+      <h3 className="text-lg font-bold mb-2">📈 Community Impact</h3>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="text-center">
+          <div className="text-2xl font-bold">1,247</div>
+          <div className="text-sm text-purple-100">Active Members</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold">3,582</div>
+          <div className="text-sm text-purple-100">Highlights Shared</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold">89</div>
+          <div className="text-sm text-purple-100">Today's Stories</div>
+        </div>
+      </div>
+    </div>
+
+    {/* Filter/Sort Options */}
+    <div className="flex gap-2 overflow-x-auto pb-2">
+      <button className="bg-blue-100 text-blue-800 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap">
+        🔥 Trending
+      </button>
+      <button className="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-gray-200">
+        ⏰ Recent
+      </button>
+      <button className="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-gray-200">
+        💼 Workplace
+      </button>
+      <button className="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-gray-200">
+        🏪 Service
+      </button>
+      <button className="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap hover:bg-gray-200">
+        ❤️ Random Acts
+      </button>
+    </div>
+    
+    {/* Community Highlights */}
+    <div className="space-y-4">
+      {communityHighlights.map((highlight) => (
+        <div key={highlight.id} className="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
+          <div className="flex justify-between items-start mb-3">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                {highlight.user.charAt(0)}
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-semibold text-gray-900">{highlight.title}</h3>
+                <p className="text-sm text-blue-600">by {highlight.user} • {highlight.timestamp}</p>
+              </div>
+            </div>
+            <button className="text-gray-400 hover:text-gray-600">
+              <Share2 className="w-4 h-4" />
+            </button>
+          </div>
+          
+          <p className="text-gray-700 mb-4 leading-relaxed">{highlight.description}</p>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <button className="flex items-center text-sm text-gray-500 hover:text-red-500 transition-colors">
+                <Heart className="w-4 h-4 mr-1" />
+                <span>{highlight.likes}</span>
+              </button>
+              <button className="flex items-center text-sm text-gray-500 hover:text-blue-500 transition-colors">
+                <Users className="w-4 h-4 mr-1" />
+                <span>{highlight.comments} comments</span>
               </button>
             </div>
+            <div className="flex gap-1">
+              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                Workplace
+              </span>
+            </div>
           </div>
-        )}
+        </div>
+      ))}
+
+      {/* Add More Community Stories */}
+      <div className="bg-white p-6 rounded-xl shadow-sm border">
+        <div className="flex justify-between items-start mb-3">
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+              A
+            </div>
+            <div className="ml-3">
+              <h3 className="text-lg font-semibold text-gray-900">Teacher made my daughter feel special</h3>
+              <p className="text-sm text-blue-600">by Anna K. • 8 hours ago</p>
+            </div>
+          </div>
+          <button className="text-gray-400 hover:text-gray-600">
+            <Share2 className="w-4 h-4" />
+          </button>
+        </div>
+        
+        <p className="text-gray-700 mb-4 leading-relaxed">
+          My shy 7-year-old was nervous about her first day at a new school. Her teacher, Mrs. Garcia, 
+          noticed she was quiet and took time to learn about her interests. By lunch, my daughter was 
+          excited to tell me about the special art project Mrs. Garcia created just for her. That teacher 
+          turned anxiety into excitement with just a little extra attention.
+        </p>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <button className="flex items-center text-sm text-gray-500 hover:text-red-500 transition-colors">
+              <Heart className="w-4 h-4 mr-1" />
+              <span>67</span>
+            </button>
+            <button className="flex items-center text-sm text-gray-500 hover:text-blue-500 transition-colors">
+              <Users className="w-4 h-4 mr-1" />
+              <span>15 comments</span>
+            </button>
+          </div>
+          <div className="flex gap-1">
+            <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+              Education
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200">
-        <div className="grid grid-cols-4 py-2">
+      <div className="bg-white p-6 rounded-xl shadow-sm border">
+        <div className="flex justify-between items-start mb-3">
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+              D
+            </div>
+            <div className="ml-3">
+              <h3 className="text-lg font-semibold text-gray-900">Uber driver's unexpected kindness</h3>
+              <p className="text-sm text-blue-600">by David L. • 12 hours ago</p>
+            </div>
+          </div>
+          <button className="text-gray-400 hover:text-gray-600">
+            <Share2 className="w-4 h-4" />
+          </button>
+        </div>
+        
+        <p className="text-gray-700 mb-4 leading-relaxed">
+          Caught in the rain without an umbrella, I was soaked when I got into the Uber. The driver, 
+          Carlos, immediately offered me a towel and turned up the heat. Then he surprised me by saying 
+          he'd wait a few extra minutes at my destination so I could grab my umbrella before my next stop. 
+          Small gesture, huge impact on my day.
+        </p>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <button className="flex items-center text-sm text-gray-500 hover:text-red-500 transition-colors">
+              <Heart className="w-4 h-4 mr-1" />
+              <span>92</span>
+            </button>
+            <button className="flex items-center text-sm text-gray-500 hover:text-blue-500 transition-colors">
+              <Users className="w-4 h-4 mr-1" />
+              <span>23 comments</span>
+            </button>
+          </div>
+          <div className="flex gap-1">
+            <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+              Service
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Load More Button */}
+      <button className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-center text-gray-500 hover:border-blue-400 hover:text-blue-600 transition-colors">
+        Load More Stories →
+      </button>
+    </div>
+
+    {/* Book Promotion */}
+    <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-xl">
+      <h3 className="text-lg font-bold mb-2">💡 Inspired by these stories?</h3>
+      <p className="text-purple-100 mb-4">
+        These highlight moments come from people applying the principles in "Be the Highlight". 
+        Get the complete guide with 200+ pages of strategies, stories, and practical tools.
+      </p>
+      <div className="flex gap-2">
         <button 
-           onClick={() => setCurrentTab('home')}
-           className={`flex flex-col items-center py-2 px-3 ${
-             currentTab === 'home' ? 'text-blue-600' : 'text-gray-400'
-           }`}
-         >
-           <Star className="w-5 h-5" />
-           <span className="text-xs mt-1">Home</span>
-         </button>
-         <button 
-           onClick={() => setCurrentTab('highlights')}
-           className={`flex flex-col items-center py-2 px-3 ${
-             currentTab === 'highlights' ? 'text-blue-600' : 'text-gray-400'
-           }`}
-         >
-           <Heart className="w-5 h-5" />
-           <span className="text-xs mt-1">Highlights</span>
-         </button>
-         <button 
-           onClick={() => setCurrentTab('skills')}
-           className={`flex flex-col items-center py-2 px-3 ${
-             currentTab === 'skills' ? 'text-blue-600' : 'text-gray-400'
-           }`}
-         >
-           <TrendingUp className="w-5 h-5" />
-           <span className="text-xs mt-1">Skills</span>
-         </button>
-         <button 
-           onClick={() => setCurrentTab('community')}
-           className={`flex flex-col items-center py-2 px-3 ${
-             currentTab === 'community' ? 'text-blue-600' : 'text-gray-400'
-           }`}
-         >
-           <Users className="w-5 h-5" />
-           <span className="text-xs mt-1">Community</span>
-         </button>
-       </div>
-     </div>
-   </div>
- )
-}
+          onClick={() => handleBookPurchase('community_inspired')}
+          className="bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
+        >
+          📚 Get the Book on Amazon
+        </button>
+        <button 
+          onClick={() => setShowAddHighlight(true)}
+          className="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-800 transition-colors"
+        >
+          Share Your Story
+        </button>
+      </div>
+    </div>
+  </div>
+)}
